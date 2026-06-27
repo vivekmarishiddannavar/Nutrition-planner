@@ -1,0 +1,197 @@
+{% extends 'diet/base.html' %}
+
+{% block title %}Weekly Report - Nutrition Planner{% endblock %}
+
+{% block page_header %}
+<div class="page-header text-center">
+    <div class="container">
+        <h1><i class="bi bi-graph-up"></i> Weekly Nutrition Report</h1>
+        <p class="mb-0">{{ start_date|date:"F d" }} - {{ end_date|date:"F d, Y" }}</p>
+    </div>
+</div>
+{% endblock %}
+
+{% block content %}
+<div class="container">
+    <!-- Weekly Averages -->
+    <div class="row mb-4">
+        <div class="col-md-4 mb-3">
+            <div class="stat-card">
+                <div class="stat-value">{{ averages.weight }} <small class="fs-6">kg</small></div>
+                <div class="stat-label">Average Weight</div>
+            </div>
+        </div>
+        <div class="col-md-4 mb-3">
+            <div class="stat-card">
+                <div class="stat-value">{{ averages.calories|floatformat:0 }} <small class="fs-6">cal</small></div>
+                <div class="stat-label">Avg. Daily Calories</div>
+                <small class="text-muted">Target: {{ profile.daily_calorie_target|floatformat:0 }} cal</small>
+            </div>
+        </div>
+        <div class="col-md-4 mb-3">
+            <div class="stat-card">
+                <div class="stat-value">{{ averages.water }} <small class="fs-6">L</small></div>
+                <div class="stat-label">Total Water</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Macro Averages -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="mb-0"><i class="bi bi-pie-chart"></i> Average Macros</h5>
+                </div>
+                <div class="card-body">
+                    <div class="row text-center">
+                        <div class="col-md-4 mb-3">
+                            <div class="alert alert-blue mb-0" style="background-color: #e3f2fd;">
+                                <h6 class="mb-2">Protein</h6>
+                                <h4 class="mb-0">{{ averages.protein|floatformat:1 }}g</h4>
+                                <small class="text-muted">Target: {{ profile.protein_target|floatformat:1 }}g</small>
+                            </div>
+                        </div>
+                        <div class="col-md-4 mb-3">
+                            <div class="alert alert-orange mb-0" style="background-color: #fff3e0;">
+                                <h6 class="mb-2">Carbohydrates</h6>
+                                <h4 class="mb-0">{{ averages.carbs|floatformat:1 }}g</h4>
+                                <small class="text-muted">Target: {{ profile.carbs_target|floatformat:1 }}g</small>
+                            </div>
+                        </div>
+                        <div class="col-md-4 mb-3">
+                            <div class="alert alert-red mb-0" style="background-color: #ffebee;">
+                                <h6 class="mb-2">Fat</h6>
+                                <h4 class="mb-0">{{ averages.fat|floatformat:1 }}g</h4>
+                                <small class="text-muted">Target: {{ profile.fat_target|floatformat:1 }}g</small>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Daily Logs Table -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="mb-0"><i class="bi bi-calendar-week"></i> Daily Breakdown</h5>
+                </div>
+                <div class="card-body">
+                    {% if weekly_logs %}
+                    <div class="table-responsive">
+                        <table class="table table-striped">
+                            <thead class="table-light">
+                                <tr>
+                                    <th>Date</th>
+                                    <th>Weight (kg)</th>
+                                    <th>Calories</th>
+                                    <th>Protein (g)</th>
+                                    <th>Carbs (g)</th>
+                                    <th>Fat (g)</th>
+                                    <th>Water (L)</th>
+                                    <th>Energy</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for log in weekly_logs %}
+                                <tr>
+                                    <td><strong>{{ log.log_date|date:"D, M d" }}</strong></td>
+                                    <td>{{ log.weight|floatformat:1 }}</td>
+                                    <td>
+                                        <span class="{% if log.calories_consumed <= profile.daily_calorie_target %}text-success{% else %}text-warning{% endif %}">
+                                            {{ log.calories_consumed|floatformat:0 }}
+                                        </span>
+                                    </td>
+                                    <td>{{ log.protein_consumed|floatformat:1 }}</td>
+                                    <td>{{ log.carbs_consumed|floatformat:1 }}</td>
+                                    <td>{{ log.fat_consumed|floatformat:1 }}</td>
+                                    <td>{{ log.water_intake|floatformat:1 }}</td>
+                                    <td>{{ log.energy_level|default:"-" }}</td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                    {% else %}
+                    <div class="text-center py-4">
+                        <i class="bi bi-inbox text-muted" style="font-size: 3rem;"></i>
+                        <p class="text-muted mt-3">No logs for this week yet.</p>
+                        <a href="{% url 'diet:log' %}" class="btn btn-primary btn-sm">
+                            <i class="bi bi-plus-circle"></i> Add Log
+                        </a>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Meal Plans for the Week -->
+    {% if weekly_meal_plans %}
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="mb-0"><i class="bi bi-calendar3"></i> Meal Plans This Week</h5>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        {% for plan in weekly_meal_plans %}
+                        <div class="col-md-4 mb-3">
+                            <div class="card">
+                                <div class="card-body">
+                                    <h6 class="card-title">
+                                        <i class="bi bi-calendar-day"></i> {{ plan.plan_date|date:"D, M d" }}
+                                    </h6>
+                                    <p class="mb-1"><strong>{{ plan.total_calories|floatformat:0 }} calories</strong></p>
+                                    <small class="text-muted">
+                                        P: {{ plan.total_protein|floatformat:0 }}g |
+                                        C: {{ plan.total_carbs|floatformat:0 }}g |
+                                        F: {{ plan.total_fat|floatformat:0 }}g
+                                    </small>
+                                    <br>
+                                    <a href="{% url 'diet:meal_plan_detail' plan.id %}" class="btn btn-sm btn-outline-primary mt-2">
+                                        View Details
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    {% endif %}
+
+    <!-- Actions -->
+    <div class="row">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-body text-center">
+                    <div class="row g-3">
+                        <div class="col-md-4">
+                            <a href="{% url 'diet:dashboard' %}" class="btn btn-primary w-100">
+                                <i class="bi bi-house-door"></i> Dashboard
+                            </a>
+                        </div>
+                        <div class="col-md-4">
+                            <a href="{% url 'diet:log' %}" class="btn btn-outline-primary w-100">
+                                <i class="bi bi-pencil-square"></i> Add Log
+                            </a>
+                        </div>
+                        <div class="col-md-4">
+                            <button onclick="window.print()" class="btn btn-outline-secondary w-100">
+                                <i class="bi bi-printer"></i> Print Report
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,323 @@
+{% extends 'diet/base.html' %}
+
+{% block title %}Dashboard - Nutrition Planner{% endblock %}
+
+{% block content %}
+<div class="container">
+    <!-- Stats Cards -->
+    <div class="row mb-4">
+        <div class="col-md-3 mb-3">
+            <div class="stat-card">
+                <div class="stat-value">{{ stats.current_weight }} <small class="fs-6">kg</small></div>
+                <div class="stat-label">Current Weight</div>
+                {% if stats.weight_change != 0 %}
+                <small class="{% if stats.weight_change < 0 %}text-success{% elif stats.weight_change > 0 %}text-danger{% else %}text-muted{% endif %}">
+                    {% if stats.weight_change > 0 %}+{% endif %}{{ stats.weight_change }}kg
+                </small>
+                {% endif %}
+            </div>
+        </div>
+        <div class="col-md-3 mb-3">
+            <div class="stat-card">
+                <div class="stat-value">{{ profile.daily_calorie_target|floatformat:0 }} <small class="fs-6">cal</small></div>
+                <div class="stat-label">Daily Target</div>
+            </div>
+        </div>
+        <div class="col-md-3 mb-3">
+            <div class="stat-card">
+                <div class="stat-value">{{ stats.avg_calories|floatformat:0 }} <small class="fs-6">cal</small></div>
+                <div class="stat-label">Avg. Consumed</div>
+            </div>
+        </div>
+        <div class="col-md-3 mb-3">
+            <div class="stat-card">
+                <div class="stat-value">{{ stats.days_tracked }}</div>
+                <div class="stat-label">Days Tracked</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Progress Bar -->
+    {% if profile.target_weight %}
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="card-title">
+                        <i class="bi bi-flag"></i> Goal Progress ({{ profile.goal|title }})
+                        {% if profile.target_weight %}- Target: {{ profile.target_weight }}kg{% endif %}
+                    </h5>
+                    <div class="progress" style="height: 30px;">
+                        <div class="progress-bar" role="progressbar"
+                             style="width: {{ stats.goal_progress }}%"
+                             aria-valuenow="{{ stats.goal_progress }}"
+                             aria-valuemin="0"
+                             aria-valuemax="100">
+                            {{ stats.goal_progress|floatformat:1 }}%
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    {% endif %}
+
+    <!-- Charts Row -->
+    <div class="row mb-4">
+        <div class="col-lg-6 mb-4">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="mb-0"><i class="bi bi-graph-up"></i> Weight Progress</h5>
+                </div>
+                <div class="card-body">
+                    <div class="chart-container">
+                        <canvas id="weightChart"></canvas>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-lg-6 mb-4">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="mb-0"><i class="bi bi-fire"></i> Calorie Intake vs Target</h5>
+                </div>
+                <div class="card-body">
+                    <div class="chart-container">
+                        <canvas id="calorieChart"></canvas>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Today's Meal Plan -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    <h5 class="mb-0"><i class="bi bi-calendar-day"></i> Today's Meal Plan - {{ meal_plan.plan_date|date:"l, F d, Y" }}</h5>
+                    <div>
+                        <a href="{% url 'diet:regenerate' %}" class="btn btn-sm btn-light">
+                            <i class="bi bi-arrow-clockwise"></i> Regenerate
+                        </a>
+                    </div>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <!-- Breakfast -->
+                        <div class="col-md-6 mb-3">
+                            <div class="meal-card">
+                                <h6><i class="bi bi-sunrise"></i> Breakfast</h6>
+                                {% for food in meal_plan.meals.breakfast %}
+                                <div class="food-item">
+                                    <strong>{{ food.name }}</strong>
+                                    <span class="macro-badge macro-protein">P: {{ food.protein }}g</span>
+                                    <span class="macro-badge macro-carbs">C: {{ food.carbs }}g</span>
+                                    <span class="macro-badge macro-fat">F: {{ food.fat }}g</span>
+                                    <br>
+                                    <small class="text-muted">{{ food.calories }} calories</small>
+                                </div>
+                                {% empty %}
+                                <p class="text-muted">No foods planned</p>
+                                {% endfor %}
+                            </div>
+                        </div>
+
+                        <!-- Lunch -->
+                        <div class="col-md-6 mb-3">
+                            <div class="meal-card">
+                                <h6><i class="bi bi-sun"></i> Lunch</h6>
+                                {% for food in meal_plan.meals.lunch %}
+                                <div class="food-item">
+                                    <strong>{{ food.name }}</strong>
+                                    <span class="macro-badge macro-protein">P: {{ food.protein }}g</span>
+                                    <span class="macro-badge macro-carbs">C: {{ food.carbs }}g</span>
+                                    <span class="macro-badge macro-fat">F: {{ food.fat }}g</span>
+                                    <br>
+                                    <small class="text-muted">{{ food.calories }} calories</small>
+                                </div>
+                                {% empty %}
+                                <p class="text-muted">No foods planned</p>
+                                {% endfor %}
+                            </div>
+                        </div>
+
+                        <!-- Dinner -->
+                        <div class="col-md-6 mb-3">
+                            <div class="meal-card">
+                                <h6><i class="bi bi-moon-stars"></i> Dinner</h6>
+                                {% for food in meal_plan.meals.dinner %}
+                                <div class="food-item">
+                                    <strong>{{ food.name }}</strong>
+                                    <span class="macro-badge macro-protein">P: {{ food.protein }}g</span>
+                                    <span class="macro-badge macro-carbs">C: {{ food.carbs }}g</span>
+                                    <span class="macro-badge macro-fat">F: {{ food.fat }}g</span>
+                                    <br>
+                                    <small class="text-muted">{{ food.calories }} calories</small>
+                                </div>
+                                {% empty %}
+                                <p class="text-muted">No foods planned</p>
+                                {% endfor %}
+                            </div>
+                        </div>
+
+                        <!-- Snack -->
+                        <div class="col-md-6 mb-3">
+                            <div class="meal-card">
+                                <h6><i class="bi bi-cookie"></i> Snack</h6>
+                                {% for food in meal_plan.meals.snack %}
+                                <div class="food-item">
+                                    <strong>{{ food.name }}</strong>
+                                    <span class="macro-badge macro-protein">P: {{ food.protein }}g</span>
+                                    <span class="macro-badge macro-carbs">C: {{ food.carbs }}g</span>
+                                    <span class="macro-badge macro-fat">F: {{ food.fat }}g</span>
+                                    <br>
+                                    <small class="text-muted">{{ food.calories }} calories</small>
+                                </div>
+                                {% empty %}
+                                <p class="text-muted">No foods planned</p>
+                                {% endfor %}
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Daily Totals -->
+                    <div class="alert alert-success mt-3">
+                        <div class="row text-center">
+                            <div class="col-md-3">
+                                <strong>Total Calories:</strong><br>
+                                <span class="fs-5">{{ meal_plan.total_calories|floatformat:0 }} / {{ profile.daily_calorie_target|floatformat:0 }}</span>
+                            </div>
+                            <div class="col-md-3">
+                                <strong>Protein:</strong><br>
+                                <span class="fs-5">{{ meal_plan.total_protein|floatformat:1 }}g / {{ profile.protein_target|floatformat:1 }}g</span>
+                            </div>
+                            <div class="col-md-3">
+                                <strong>Carbs:</strong><br>
+                                <span class="fs-5">{{ meal_plan.total_carbs|floatformat:1 }}g / {{ profile.carbs_target|floatformat:1 }}g</span>
+                            </div>
+                            <div class="col-md-3">
+                                <strong>Fat:</strong><br>
+                                <span class="fs-5">{{ meal_plan.total_fat|floatformat:1 }}g / {{ profile.fat_target|floatformat:1 }}g</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Quick Actions -->
+    <div class="row">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-body text-center">
+                    <h5 class="card-title mb-3">Quick Actions</h5>
+                    <div class="row g-3">
+                        <div class="col-md-4">
+                            <a href="{% url 'diet:log' %}" class="btn btn-primary w-100">
+                                <i class="bi bi-pencil-square"></i> Log Today
+                            </a>
+                        </div>
+                        <div class="col-md-4">
+                            <a href="{% url 'diet:weekly_report' %}" class="btn btn-outline-primary w-100">
+                                <i class="bi bi-graph-up"></i> View Reports
+                            </a>
+                        </div>
+                        <div class="col-md-4">
+                            <a href="{% url 'diet:update_profile' %}" class="btn btn-outline-secondary w-100">
+                                <i class="bi bi-gear"></i> Update Profile
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const chartData = JSON.parse('{{ chart_data|safe }}');
+
+    // Weight Chart
+    const weightCtx = document.getElementById('weightChart').getContext('2d');
+    new Chart(weightCtx, {
+        type: 'line',
+        data: {
+            labels: chartData.labels,
+            datasets: [{
+                label: 'Weight (kg)',
+                data: chartData.weight,
+                borderColor: 'rgb(40, 167, 69)',
+                backgroundColor: 'rgba(40, 167, 69, 0.1)',
+                tension: 0.3,
+                fill: true,
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: {
+                    display: false
+                }
+            },
+            scales: {
+                y: {
+                    beginAtZero: false,
+                    title: {
+                        display: true,
+                        text: 'Weight (kg)'
+                    }
+                }
+            }
+        }
+    });
+
+    // Calorie Chart
+    const calorieCtx = document.getElementById('calorieChart').getContext('2d');
+    new Chart(calorieCtx, {
+        type: 'line',
+        data: {
+            labels: chartData.labels,
+            datasets: [{
+                label: 'Calories Consumed',
+                data: chartData.calories,
+                borderColor: 'rgb(32, 201, 151)',
+                backgroundColor: 'rgba(32, 201, 151, 0.1)',
+                tension: 0.3,
+                fill: true,
+            }, {
+                label: 'Target',
+                data: chartData.target_calories,
+                borderColor: 'rgb(255, 193, 7)',
+                borderDash: [5, 5],
+                fill: false,
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: {
+                    display: true,
+                    position: 'top'
+                }
+            },
+            scales: {
+                y: {
+                    beginAtZero: true,
+                    title: {
+                        display: true,
+                        text: 'Calories'
+                    }
+                }
+            }
+        }
+    });
+});
+</script>
+{% endblock %}

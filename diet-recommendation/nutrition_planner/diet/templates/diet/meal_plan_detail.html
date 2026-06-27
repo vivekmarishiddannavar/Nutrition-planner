@@ -1,0 +1,100 @@
+{% extends 'diet/base.html' %}
+
+{% block title %}Meal Plan - {{ meal_plan.plan_date }}{% endblock %}
+
+{% block page_header %}
+<div class="page-header text-center">
+    <div class="container">
+        <h1><i class="bi bi-calendar-day"></i> Meal Plan</h1>
+        <p class="mb-0">{{ meal_plan.plan_date|date:"l, F d, Y" }}</p>
+    </div>
+</div>
+{% endblock %}
+
+{% block content %}
+<div class="container">
+    <!-- Daily Totals -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="mb-0"><i class="bi bi-calculator"></i> Daily Nutrition Totals</h5>
+                </div>
+                <div class="card-body">
+                    <div class="row text-center">
+                        <div class="col-md-3 mb-3">
+                            <h4 class="text-success">{{ meal_plan.total_calories|floatformat:0 }}</h4>
+                            <p class="text-muted mb-0">Calories</p>
+                            <small>Target: {{ meal_plan.profile.daily_calorie_target|floatformat:0 }}</small>
+                        </div>
+                        <div class="col-md-3 mb-3">
+                            <h4 class="text-primary">{{ meal_plan.total_protein|floatformat:1 }}g</h4>
+                            <p class="text-muted mb-0">Protein</p>
+                            <small>Target: {{ meal_plan.profile.protein_target|floatformat:1 }}g</small>
+                        </div>
+                        <div class="col-md-3 mb-3">
+                            <h4 class="text-warning">{{ meal_plan.total_carbs|floatformat:1 }}g</h4>
+                            <p class="text-muted mb-0">Carbs</p>
+                            <small>Target: {{ meal_plan.profile.carbs_target|floatformat:1 }}g</small>
+                        </div>
+                        <div class="col-md-3 mb-3">
+                            <h4 class="text-danger">{{ meal_plan.total_fat|floatformat:1 }}g</h4>
+                            <p class="text-muted mb-0">Fat</p>
+                            <small>Target: {{ meal_plan.profile.fat_target|floatformat:1 }}g</small>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Meals -->
+    <div class="row">
+        {% for meal_type in "breakfast lunch dinner snack" %}
+        <div class="col-lg-6 mb-4">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="mb-0">
+                        {% if meal_type == "breakfast" %}<i class="bi bi-sunrise"></i>
+                        {% elif meal_type == "lunch" %}<i class="bi bi-sun"></i>
+                        {% elif meal_type == "dinner" %}<i class="bi bi-moon-stars"></i>
+                        {% else %}<i class="bi bi-cookie"></i>{% endif %}
+                        {{ meal_type|title }}
+                    </h5>
+                </div>
+                <div class="card-body">
+                    {% for food in meal_plan.meals.get_dict|get_item:meal_type %}
+                    <div class="meal-card">
+                        <h6>{{ food.name }}</h6>
+                        <div class="mb-2">
+                            <span class="macro-badge macro-protein">P: {{ food.protein }}g</span>
+                            <span class="macro-badge macro-carbs">C: {{ food.carbs }}g</span>
+                            <span class="macro-badge macro-fat">F: {{ food.fat }}g</span>
+                        </div>
+                        <small class="text-muted">
+                            <i class="bi bi-fire"></i> {{ food.calories }} calories
+                        </small>
+                    </div>
+                    {% empty %}
+                    <p class="text-muted">No foods planned for this meal.</p>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+
+    <!-- Actions -->
+    <div class="row">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-body text-center">
+                    <a href="{% url 'diet:dashboard' %}" class="btn btn-primary">
+                        <i class="bi bi-arrow-left"></i> Back to Dashboard
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

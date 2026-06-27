@@ -1,0 +1,128 @@
+{% extends 'diet/base.html' %}
+
+{% block title %}About - Nutrition Planner{% endblock %}
+
+{% block page_header %}
+<div class="page-header text-center">
+    <div class="container">
+        <h1><i class="bi bi-info-circle"></i> About Nutrition Planner</h1>
+        <p class="mb-0">How personalized nutrition planning works</p>
+    </div>
+</div>
+{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+            <!-- How It Works -->
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h5 class="mb-0"><i class="bi bi-gear"></i> How It Works</h5>
+                </div>
+                <div class="card-body">
+                    <p class="lead">Nutrition Planner uses scientifically proven formulas 
+                        to create personalized meal plans based on your unique health 
+                        data and goals.</p>
+
+                    <h6 class="mt-4">1. <i class="bi bi-1-circle"></i> Calculate Your BMR</h6>
+                    <p>We use the <strong>Mifflin-St Jeor Equation</strong>, considered the most 
+                        accurate formula for calculating Basal Metabolic Rate (BMR):</p>
+                    <div class="alert alert-info">
+                        <code>Men: BMR = (10 × weight) + (6.25 × height) - (5 × age) + 5</code><br>
+                        <code>Women: BMR = (10 × weight) + (6.25 × height) - (5 × age) - 161</code>
+                    </div>
+
+                    <h6 class="mt-4">2. <i class="bi bi-2-circle"></i> Calculate Your TDEE</h6>
+                    <p>Total Daily Energy Expenditure (TDEE) is calculated by multiplying your BMR by an activity factor:</p>
+                    <ul>
+                        <li><strong>Sedentary:</strong> BMR × 1.2 (little or no exercise)</li>
+                        <li><strong>Lightly Active:</strong> BMR × 1.375 (light exercise 1-3 days/week)</li>
+                        <li><strong>Moderately Active:</strong> BMR × 1.55 (moderate exercise 3-5 days/week)</li>
+                        <li><strong>Very Active:</strong> BMR × 1.725 (hard exercise 6-7 days/week)</li>
+                        <li><strong>Extra Active:</strong> BMR × 1.9 (very hard exercise & physical job)</li>
+                    </ul>
+
+                    <h6 class="mt-4">3. <i class="bi bi-3-circle"></i> Adjust for Your Goal</h6>
+                    <p>We adjust your calorie target based on your goal:</p>
+                    <ul>
+                        <li><strong>Lose Weight:</strong> TDEE - 500 calories/day</li>
+                        <li><strong>Maintain Weight:</strong> TDEE (no adjustment)</li>
+                        <li><strong>Gain Weight:</strong> TDEE + 500 calories/day</li>
+                    </ul>
+
+                    <h6 class="mt-4">4. <i class="bi bi-4-circle"></i> Calculate Macro Targets</h6>
+                    <p>Macronutrients are distributed based on your goal:</p>
+                    <ul>
+                        <li><strong>Weight Loss:</strong> 40% Protein, 30% Carbs, 30% Fat</li>
+                        <li><strong>Maintain:</strong> 30% Protein, 40% Carbs, 30% Fat</li>
+                        <li><strong>Weight Gain:</strong> 30% Protein, 50% Carbs, 20% Fat</li>
+                    </ul>
+
+                    <h6 class="mt-4">5. <i class="bi bi-5-circle"></i> Generate Personalized Meal Plans</h6>
+                    <p>Our intelligent meal generator creates daily meal plans that match your calorie and macro targets, while respecting your dietary preferences (vegetarian, vegan, keto, etc.).</p>
+                </div>
+            </div>
+
+            <!-- Features -->
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h5 class="mb-0"><i class="bi bi-stars"></i> Features</h5>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <h6><i class="bi bi-calculator text-success"></i> Smart Calculations</h6>
+                            <p class="text-muted">Uses the Mifflin-St Jeor equation for accurate BMR/TDEE calculations</p>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <h6><i class="bi bi-pie-chart text-primary"></i> Macro Tracking</h6>
+                            <p class="text-muted">Track protein, carbs, and fats with daily targets</p>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <h6><i class="bi bi-calendar-week text-warning"></i> Meal Planning</h6>
+                            <p class="text-muted">Auto-generates personalized meal plans based on your targets</p>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <h6><i class="bi bi-graph-up text-danger"></i> Progress Charts</h6>
+                            <p class="text-muted">Visualize your weight and calorie intake over time</p>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <h6><i class="bi bi-heart-pulse text-info"></i> Health Goals</h6>
+                            <p class="text-muted">Support for weight loss, maintenance, or gain goals</p>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <h6><i class="bi bi-check-circle text-secondary"></i> Dietary Preferences</h6>
+                            <p class="text-muted">Options for vegetarian, vegan, keto, paleo, and gluten-free diets</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Disclaimer -->
+            <div class="card mb-4">
+                <div class="card-body bg-light">
+                    <h6 class="text-warning"><i class="bi bi-exclamation-triangle"></i> Important Disclaimer</h6>
+                    <p class="mb-0">This tool provides general nutritional guidance and is not a substitute for professional medical advice. Consult with a registered dietitian or healthcare provider before making significant changes to your diet.</p>
+                </div>
+            </div>
+
+            <!-- Tech Stack -->
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="mb-0"><i class="bi bi-code-slash"></i> Technology Stack</h5>
+                </div>
+                <div class="card-body">
+                    <p>Nutrition Planner is built with modern, open-source technologies:</p>
+                    <ul>
+                        <li><strong>Backend:</strong> Django 6.0 (Python)</li>
+                        <li><strong>Frontend:</strong> HTML5, Bootstrap 5, Vanilla JavaScript</li>
+                        <li><strong>Database:</strong> SQLite</li>
+                        <li><strong>Visualization:</strong> Chart.js</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

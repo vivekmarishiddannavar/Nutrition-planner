@@ -1,0 +1,149 @@
+{% extends 'diet/base.html' %}
+
+{% block title %}Daily Log - Nutrition Planner{% endblock %}
+
+{% block page_header %}
+<div class="page-header text-center">
+    <div class="container">
+        <h1><i class="bi bi-pencil-square"></i> Daily Log</h1>
+        <p class="mb-0">Track your weight and daily intake</p>
+    </div>
+</div>
+{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="mb-0"><i class="bi bi-calendar-plus"></i> Log for {{ today|date:"l, F d, Y" }}</h5>
+                </div>
+                <div class="card-body">
+                    <form method="post">
+                        {% csrf_token %}
+                        <!-- Date & Weight -->
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label for="log_date" class="form-label">Date</label>
+                                <input type="date" class="form-control" id="log_date" name="log_date"
+                                       value="{% if existing_log %}{{ existing_log.log_date|date:'Y-m-d' }}{% else %}{{ today|date:'Y-m-d' }}{% endif %}"
+                                       required>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label for="weight" class="form-label">Weight (kg) *</label>
+                                <input type="number" class="form-control" id="weight" name="weight"
+                                       value="{% if existing_log %}{{ existing_log.weight }}{% else %}{{ profile.weight }}{% endif %}"
+                                       step="0.1" min="30" max="300" required>
+                            </div>
+                        </div>
+
+                        <!-- Macros -->
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label for="calories_consumed" class="form-label">Calories Consumed</label>
+                                <input type="number" class="form-control" id="calories_consumed" name="calories_consumed"
+                                       value="{% if existing_log %}{{ existing_log.calories_consumed }}{% endif %}"
+                                       min="0" max="10000" step="0.1">
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label for="protein_consumed" class="form-label">Protein (g)</label>
+                                <input type="number" class="form-control" id="protein_consumed" name="protein_consumed"
+                                       value="{% if existing_log %}{{ existing_log.protein_consumed }}{% endif %}"
+                                       min="0" max="500" step="0.1">
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label for="carbs_consumed" class="form-label">Carbs (g)</label>
+                                <input type="number" class="form-control" id="carbs_consumed" name="carbs_consumed"
+                                       value="{% if existing_log %}{{ existing_log.carbs_consumed }}{% endif %}"
+                                       min="0" max="1000" step="0.1">
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label for="fat_consumed" class="form-label">Fat (g)</label>
+                                <input type="number" class="form-control" id="fat_consumed" name="fat_consumed"
+                                       value="{% if existing_log %}{{ existing_log.fat_consumed }}{% endif %}"
+                                       min="0" max="500" step="0.1">
+                            </div>
+                        </div>
+
+                        <!-- Water & Energy -->
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label for="water_intake" class="form-label">Water Intake (liters)</label>
+                                <input type="number" class="form-control" id="water_intake" name="water_intake"
+                                       value="{% if existing_log %}{{ existing_log.water_intake }}{% endif %}"
+                                       min="0" max="10" step="0.1">
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label for="energy_level" class="form-label">Energy Level (1-10)</label>
+                                <select class="form-select" id="energy_level" name="energy_level">
+                                    <option value="">Select Level</option>
+                                    {% for i in "12345678910" %}
+                                    <option value="{{ i }}" {% if existing_log and existing_log.energy_level == i %}selected{% endif %}>
+                                        {{ i }} - {% if i == 1 %}Very Low{% elif i == 5 %}Moderate{% elif i == 10 %}Very High{% endif %}
+                                    </option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                        </div>
+
+                        <!-- Notes -->
+                        <div class="mb-4">
+                            <label for="notes" class="form-label">Notes</label>
+                            <textarea class="form-control" id="notes" name="notes" rows="3"
+                                      placeholder="How did you feel today? Any comments about your meals or workouts?">{% if existing_log %}{{ existing_log.notes }}{% endif %}</textarea>
+                        </div>
+
+                        <!-- Target Reference -->
+                        <div class="alert alert-info">
+                            <h6><i class="bi bi-bullseye"></i> Your Daily Targets</h6>
+                            <div class="row">
+                                <div class="col-6">
+                                    <strong>Calories:</strong> {{ profile.daily_calorie_target|floatformat:0 }} cal
+                                </div>
+                                <div class="col-6">
+                                    <strong>Protein:</strong> {{ profile.protein_target|floatformat:1 }}g
+                                </div>
+                                <div class="col-6 mt-2">
+                                    <strong>Carbs:</strong> {{ profile.carbs_target|floatformat:1 }}g
+                                </div>
+                                <div class="col-6 mt-2">
+                                    <strong>Fat:</strong> {{ profile.fat_target|floatformat:1 }}g
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Buttons -->
+                        <div class="d-grid gap-2">
+                            <button type="submit" class="btn btn-primary btn-lg">
+                                <i class="bi bi-check-circle"></i> Save Log
+                            </button>
+                            <a href="{% url 'diet:dashboard' %}" class="btn btn-outline-secondary">
+                                <i class="bi bi-arrow-left"></i> Back to Dashboard
+                            </a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Auto-fill calories from meal plan if available
+    const logDate = document.getElementById('log_date');
+    const caloriesInput = document.getElementById('calories_consumed');
+
+    logDate.addEventListener('change', function() {
+        // You could add logic here to fetch meal plan calories for selected date
+        // For now, keep it manual
+    });
+});
+</script>
+{% endblock %}

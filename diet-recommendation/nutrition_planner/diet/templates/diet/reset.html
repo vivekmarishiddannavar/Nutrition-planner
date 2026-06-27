@@ -1,0 +1,44 @@
+{% extends 'diet/base.html' %}
+
+{% block title %}Reset Profile - Nutrition Planner{% endblock %}
+
+{% block page_header %}
+<div class="page-header text-center">
+    <div class="container">
+        <h1><i class="bi bi-arrow-counterclockwise"></i> Reset Profile</h1>
+        <p class="mb-0">Start fresh with a new profile</p>
+    </div>
+</div>
+{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="row justify-content-center">
+        <div class="col-lg-6">
+            <div class="card">
+                <div class="card-body text-center py-5">
+                    <i class="bi bi-exclamation-triangle text-warning" style="font-size: 4rem;"></i>
+                    <h4 class="mt-4">Are you sure you want to reset?</h4>
+                    <p class="text-muted">This will delete your current profile, meal plans, and all logs. This action cannot be undone.</p>
+
+                    <div class="alert alert-danger">
+                        <strong>Warning:</strong> All your data will be permanently deleted.
+                    </div>
+
+                    <form method="post">
+                        {% csrf_token %}
+                        <div class="d-grid gap-2">
+                            <button type="submit" class="btn btn-danger btn-lg">
+                                <i class="bi bi-trash"></i> Yes, Reset My Profile
+                            </button>
+                            <a href="{% url 'diet:dashboard' %}" class="btn btn-outline-secondary">
+                                <i class="bi bi-x-circle"></i> Cancel, Go Back
+                            </a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
